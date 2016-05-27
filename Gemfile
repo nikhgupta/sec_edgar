@@ -45,3 +45,9 @@ group :development do
   gem 'spring'
 end
 
+
+gem 'sidekiq'
+gem 'sinatra', require: false
+
+gem 'devise', '~> 3'
+gem 'activeadmin', '~> 1.0.0.pre2'
