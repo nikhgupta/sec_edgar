@@ -1,11 +1,17 @@
 module SecEdgar
   class Lister < Base
+    sidekiq_options queue: :sec_edgar_lister
+
     EXCHANGES_USED = ["NASDAQ", "NYSE"]
 
     def perform
-      companies.each do |data|
-        record = create_or_update_company(data)
-        SecEdgar::Crawler.perform_async record.id
+      companies.each_slice(50) do |slice|
+        ActiveRecord::Base.transaction do
+          slice.each do |data|
+            record = create_or_update_company(data)
+            SecEdgar::Crawler.perform_async record.id
+          end
+        end
       end
     end
 
@@ -16,9 +22,9 @@ module SecEdgar
       return scope.first if scope.exists?
 
       Company.create(symbol: data[:symbol],
-        name: data[:name], sector: data[:sector],
-        industry: data[:industry], ipo_year: data[:ipoyear],
-        last_sale: data[:lastsale], market_capital: data[:marketcap])
+                     name: data[:name], sector: data[:sector],
+                     industry: data[:industry], ipo_year: data[:ipoyear],
+                     last_sale: data[:lastsale], market_capital: data[:marketcap])
     end
 
     def companies

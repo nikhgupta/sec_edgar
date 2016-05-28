@@ -1,0 +1,15 @@
+---
+:concurrency: 10
+:pidfile: tmp/pids/sidekiq.pid
+staging:
+  :concurrency: 10
+production:
+  :concurrency: 20
+  :logfile: log/sidekiq.log
+  :daemon: true
+:queues:
+  - [sec_edgar_crawler,   1]
+  - [sec_edgar_lister,    1]
+  - [sec_edgar_uploader,  3]
+  - [sec_edgar_parser,    5]
+  - [sec_edgar_creator,   5]

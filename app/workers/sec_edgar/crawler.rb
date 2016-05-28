@@ -1,5 +1,7 @@
 module SecEdgar
   class Crawler < Base
+    sidekiq_options queue: :sec_edgar_crawler
+
     def perform(company_id)
       company = Company.find company_id
       html = get_node("#{SEC_SEARCH_URL}&CIK=#{company.symbol}")

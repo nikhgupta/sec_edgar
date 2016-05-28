@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160528000509) do
+ActiveRecord::Schema.define(version: 20160528160510) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -40,8 +40,9 @@ ActiveRecord::Schema.define(version: 20160528000509) do
     t.decimal  "last_sale",                precision: 8, scale: 2, default: 0.0
     t.integer  "market_capital", limit: 8,                         default: 0
     t.integer  "ipo_year"
-    t.datetime "created_at",                                                     null: false
-    t.datetime "updated_at",                                                     null: false
+    t.boolean  "listed",                                           default: true
+    t.datetime "created_at",                                                      null: false
+    t.datetime "updated_at",                                                      null: false
   end
 
   create_table "reports", force: :cascade do |t|
@@ -52,6 +53,8 @@ ActiveRecord::Schema.define(version: 20160528000509) do
     t.datetime "processed_at"
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
+    t.string   "pdf_url"
+    t.string   "excel_url"
   end
 
   add_index "reports", ["company_id"], name: "index_reports_on_company_id", using: :btree

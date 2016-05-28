@@ -13,3 +13,5 @@
 /tmp
 testdata*
 testfile*
+public/uploads/
+.rbenv-vars

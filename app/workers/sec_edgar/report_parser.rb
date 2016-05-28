@@ -2,40 +2,32 @@ require 'open-uri'
 
 module SecEdgar
   class ReportParser < Base
-    include Sidekiq::Worker
+    sidekiq_options queue: :sec_edgar_parser
+
     def perform(report_id)
-      report    = Report.includes(:company).find(report_id)
-      url       = "#{SEC_ARCHIVES_URL}#{report.raw_path}"
-      html      = get_html(url)
-      documents = html.split("<DOCUMENT>")
-      documents = documents.map{ |doc| extract_info(doc)  }.compact
-      html      = merge_documents_for_reporting(documents)
-      html_file = "#{report.company.symbol} #{report.filed_at.year} #{report.company.name}.pdf"
-      xlsx_file = "#{report.company.symbol} #{report.filed_at.year} #{report.company.name}_Financials.xlsx"
+      report = Report.includes(:company).find(report_id)
+      return if report.processed?
 
-      create_pdf_report html, html_file
-      download_financial_report report, xlsx_file
-
-      report.update_attribute :processed_at, Time.now
+      docs = get_documents report
+      docs = docs.map{ |doc| extract_info(doc)  }.compact
+      html = merge_documents_for_reporting(docs)
+      html = sanitize_html html
+      file = "/tmp/html-report-#{report_id}.html"
+      File.open(file, "wb"){|f| f << html}
+      ReportCreator.perform_async report_id, file
     end
 
     protected
 
-    # ensure that the filename is compliant
-    def write_binary(file, data)
-      File.open(file.to_s, "wb"){|f| f << data}
-      file.to_s
-    end
-
-    def download_financial_report(report, file)
-      url = URI.join(SEC_ARCHIVES_URL, report.excel_path).to_s
-      write_binary file, open(url).read
-    rescue OpenURI::HTTPError
-    end
-
-    def create_pdf_report(html, file)
-      html = sanitize_html html
-      write_binary file, WickedPdf.new.pdf_from_string(html)
+    def get_documents(report)
+      url  = "#{SEC_ARCHIVES_URL}#{report.index_path}"
+      node = Nokogiri::HTML get_html(url)
+      docs = node.search(".tableFile a").map{|a| a.attr("href")}
+      docs = docs.select{|a| a =~ /\.html?$/ }
+      return docs.map{|a| get_html URI.join(SEC_ARCHIVES_URL, a).to_s } if docs.any?
+      url  = "#{SEC_ARCHIVES_URL}#{report.raw_path}"
+      html = get_html(url)
+      html.split("<DOCUMENT>")
     end
 
     def merge_documents_for_reporting(documents)
@@ -43,7 +35,7 @@ module SecEdgar
         "<div style='page-break-after:always;'>
          <h1 style='padding-top: 600px; text-align: center; font-size: 128px'>#{doc[:type]}</h1>
          </div><div id='body-of-#{doc[:type]}' style='page-break-after:always;'>
-        #{Nokogiri::HTML(doc[:text]).search("body").first.inner_html.strip}</div>"
+        #{Nokogiri::HTML(doc[:text]).search("body").first.inner_html}</div>"
       end.join
       "<html><head><title>SOME TITLE</title></head><body>#{html}</body></html>"
     end
@@ -82,18 +74,15 @@ module SecEdgar
       # remove some extra formatting from the first page of the document
       node.search("body h5:first, hr[size='3'], body div:first hr[size='1']").remove()
 
-      # old filings have <page> tags to denote different pages
       html = node.to_s
-      html = html.gsub("<page>", "</pre><pre style='page-break-after:always'>")
-      html = html.gsub(/<\/?(table|caption|s|c)>/, '')
-      html = html.gsub(/^=+$/, '')
-      # node.search("page").each do |tag|
-      #   tag.name = "br"
-      #   tag.set_attribute "style", "page-break-after:always"
-      # end
-      html
 
-      # node.to_s
+      if node.search("page").any?
+        html = html.gsub("<page>", "</pre><pre style='page-break-after:always'>")
+        html = html.gsub(/<\/?(table|caption|s|c)>/, '')
+        html = html.gsub(/^=+$/, '')
+      end
+
+      html
     end
 
     def get_html(url)

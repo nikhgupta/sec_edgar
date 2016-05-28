@@ -56,3 +56,4 @@ gem 'activeadmin', '~> 1.0.0.pre2'
 
 gem 'nokogiri'
 gem 'wicked_pdf'
+gem 'dropbox-sdk'
