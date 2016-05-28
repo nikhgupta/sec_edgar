@@ -35,6 +35,8 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
+
+  gem 'pry-rails'
 end
 
 group :development do
@@ -51,3 +53,6 @@ gem 'sinatra', require: false
 
 gem 'devise', '~> 3'
 gem 'activeadmin', '~> 1.0.0.pre2'
+
+gem 'nokogiri'
+gem 'wicked_pdf'
