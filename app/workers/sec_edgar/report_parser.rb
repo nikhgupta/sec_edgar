@@ -9,7 +9,6 @@ module SecEdgar
       html      = get_html(url)
       documents = html.split("<DOCUMENT>")
       documents = documents.map{ |doc| extract_info(doc)  }.compact
-      binding.pry
       html      = merge_documents_for_reporting(documents)
       html_file = "#{report.company.symbol} #{report.filed_at.year} #{report.company.name}.pdf"
       xlsx_file = "#{report.company.symbol} #{report.filed_at.year} #{report.company.name}_Financials.xlsx"
@@ -24,7 +23,6 @@ module SecEdgar
 
     # ensure that the filename is compliant
     def write_binary(file, data)
-      binding.pry
       File.open(file.to_s, "wb"){|f| f << data}
       file.to_s
     end
@@ -36,7 +34,6 @@ module SecEdgar
     end
 
     def create_pdf_report(html, file)
-      binding.pry
       html = sanitize_html html
       write_binary file, WickedPdf.new.pdf_from_string(html)
     end
@@ -44,7 +41,7 @@ module SecEdgar
     def merge_documents_for_reporting(documents)
       html = documents.map do |doc|
         "<div style='page-break-after:always;'>
-         <h1 style='margin: 20% 20px; text-align: center'>#{doc[:type]}</h1>
+         <h1 style='padding-top: 600px; text-align: center; font-size: 128px'>#{doc[:type]}</h1>
          </div><div id='body-of-#{doc[:type]}' style='page-break-after:always;'>
         #{Nokogiri::HTML(doc[:text]).search("body").first.inner_html.strip}</div>"
       end.join
@@ -56,7 +53,7 @@ module SecEdgar
       data = Hash[keys.map{|i| [i,node.match(/^<#{i}>(.*?)\n/i).try(:[],1)]}]
 
       return if !data[:type] || data[:type].downcase == "xml"
-      return unless data[:filename] =~ /\.html?$/
+      return unless data[:filename] =~ /\.(html?|te?xt)$/
 
       data[:text] = node.match(/^<text>(.*?)<\/text>/mi).try(:[],1)
       data
@@ -64,6 +61,8 @@ module SecEdgar
 
     def sanitize_html(html)
       node = Nokogiri::HTML html
+
+      # replace anchor names that conflict with page links in PDF
       node.search("p font a[name]").each do |a|
         p = a.parent.parent.parent rescue next
         p.set_attribute("id", a.attr("name"))
@@ -80,8 +79,21 @@ module SecEdgar
         end
       end
 
+      # remove some extra formatting from the first page of the document
       node.search("body h5:first, hr[size='3'], body div:first hr[size='1']").remove()
-      node.to_s
+
+      # old filings have <page> tags to denote different pages
+      html = node.to_s
+      html = html.gsub("<page>", "</pre><pre style='page-break-after:always'>")
+      html = html.gsub(/<\/?(table|caption|s|c)>/, '')
+      html = html.gsub(/^=+$/, '')
+      # node.search("page").each do |tag|
+      #   tag.name = "br"
+      #   tag.set_attribute "style", "page-break-after:always"
+      # end
+      html
+
+      # node.to_s
     end
 
     def get_html(url)
