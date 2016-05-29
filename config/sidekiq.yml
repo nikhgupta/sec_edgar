@@ -8,7 +8,7 @@ production:
   :logfile: log/sidekiq.log
   :daemon: true
 :queues:
-  - [sec_edgar_crawler,  1]
   - [sec_edgar_lister,   1]
-  - [sec_edgar_parser,   5]
-  - [sec_edgar_reporter, 9]
+  - [sec_edgar_crawler,  1]
+  - [sec_edgar_parser,   1]
+  - [sec_edgar_reporter, 3]

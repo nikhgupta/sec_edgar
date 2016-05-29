@@ -14,7 +14,10 @@ class MonitorController < ApplicationController
 
   def set_stats
     @stats = Sidekiq::Stats.new
-    @stats = { enqueued: @stats.enqueued, queues: @stats.queues }
+    @stats = {
+      enqueued: @stats.enqueued, queues: @stats.queues, failed: @stats.failed,
+      retry: @stats.retry_size
+    }
   end
 
   def set_queues

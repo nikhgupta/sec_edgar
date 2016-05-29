@@ -38,7 +38,7 @@ ActiveAdmin.register_page "Dashboard" do
         raw "Seems like there are no enqueued jobs. You can #{link} now!"
       end
 
-      small(style: "font-size: 12px") { "updated every 5 seconds.." }
+      small(style: "font-size: 12px") { "updated every second.." }
     end
   end
 end
