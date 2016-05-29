@@ -17,3 +17,17 @@
 //   .status_tag { background: #6090DB; }
 
 #footer p { display: none; }
+
+#queue-progress {
+  font-size: 1.4em;
+  width: 50%;
+  margin: 0 auto;
+  thead th { text-align: center }
+  td, th { border: 1px solid #dfdfdf; }
+  .message-area {
+    display: none;
+    background-color: #dfd;
+    padding: 10px 20px;
+    border: 1px solid #aba;
+  }
+}

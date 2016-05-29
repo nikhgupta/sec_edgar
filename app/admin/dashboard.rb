@@ -1,33 +1,44 @@
+require 'sidekiq/api'
+
 ActiveAdmin.register_page "Dashboard" do
 
   menu priority: 1, label: proc{ I18n.t("active_admin.dashboard") }
 
-  content title: proc{ I18n.t("active_admin.dashboard") } do
-    div class: "blank_slate_container", id: "dashboard_default_message" do
-      span class: "blank_slate" do
-        span I18n.t("active_admin.dashboard_welcome.welcome")
-        small I18n.t("active_admin.dashboard_welcome.call_to_action")
-      end
+  action_item :run, only: :index do
+    link_to 'Run Script!', dashboard_run_script_path, method: :post
+  end
+
+  page_action :run_script, method: :post do
+    if Sidekiq::Stats.new.enqueued > 0
+      message = { alert: "Script was not started. It seems that jobs are already in queue!" }
+    else
+      SecEdgar::Lister.perform_async
+      message = { notice: "Script has been started. Please, make sure it has finished before doing this, again!" }
     end
+    redirect_to dashboard_path, message
+  end
 
-    # Here is an example of a simple dashboard with columns and panels.
-    #
-    # columns do
-    #   column do
-    #     panel "Recent Posts" do
-    #       ul do
-    #         Post.recent(5).map do |post|
-    #           li link_to(post.title, admin_post_path(post))
-    #         end
-    #       end
-    #     end
-    #   end
+  content title: proc{ I18n.t("active_admin.dashboard") } do
+    div class: "progress", id: "queue-progress" do
+      table do
+        thead do
+          tr do
+            th(colspan: 2){ "Queue Progress" }
+          end
+        end
+        tbody(class: "ajaxed-area") do
+          tr do
+            td(colspan: 2){ "Waiting..."}
+          end
+        end
+      end
 
-    #   column do
-    #     panel "Info" do
-    #       para "Welcome to ActiveAdmin."
-    #     end
-    #   end
-    # end
-  end # content
+      div class: "message-area" do
+        link = link_to 'run the script', dashboard_run_script_path, method: :post
+        raw "Seems like there are no enqueued jobs. You can #{link} now!"
+      end
+
+      small(style: "font-size: 12px") { "updated every 5 seconds.." }
+    end
+  end
 end

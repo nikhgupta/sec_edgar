@@ -10,8 +10,8 @@ module SecEdgar
 
       docs = get_documents report
       docs = docs.map{ |doc| extract_info(doc)  }.compact
-      html = merge_documents_for_reporting(docs)
-      html = sanitize_html html
+      html = merge_documents_for_reporting(report, docs)
+      html = sanitize_html(html)
       file = "/tmp/html-report-#{report_id}.html"
       File.open(file, "wb"){|f| f << html}
       ReportCreator.perform_async report_id, file
@@ -30,14 +30,15 @@ module SecEdgar
       html.split("<DOCUMENT>")
     end
 
-    def merge_documents_for_reporting(documents)
+    def merge_documents_for_reporting(report, documents)
+      name = "#{report.company.symbol} #{report.filed_at.year} #{report.company.name}"
       html = documents.map do |doc|
         "<div style='page-break-after:always;'>
          <h1 style='padding-top: 600px; text-align: center; font-size: 128px'>#{doc[:type]}</h1>
          </div><div id='body-of-#{doc[:type]}' style='page-break-after:always;'>
         #{Nokogiri::HTML(doc[:text]).search("body").first.inner_html}</div>"
       end.join
-      "<html><head><title>SOME TITLE</title></head><body>#{html}</body></html>"
+      "<html><head><title>#{name}</title></head><body>#{html}</body></html>"
     end
 
     def extract_info(node)
@@ -56,8 +57,9 @@ module SecEdgar
 
       # replace anchor names that conflict with page links in PDF
       node.search("p font a[name]").each do |a|
-        p = a.parent.parent.parent rescue next
-        p.set_attribute("id", a.attr("name"))
+        p = a.ancestors("p").try :first
+        next unless p
+        p.set_attribute("id", a.attr("name").downcase)
         a.remove
 
         tags = p.search("a[name]")
@@ -65,8 +67,8 @@ module SecEdgar
 
         tags.each do |tag|
           tag.remove
-          node.search("[href='##{tag.attr('name')}']").map do |x|
-            x.set_attribute('href', "##{a.attr('name')}")
+          node.search("[href='##{tag.attr('name').downcase}']").map do |x|
+            x.set_attribute('href', "##{a.attr('name').downcase}")
           end
         end
       end
