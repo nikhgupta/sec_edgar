@@ -9,9 +9,11 @@ module SecEdgar
         ActiveRecord::Base.transaction do
           slice.each do |data|
             record = create_or_update_company(data)
-            SecEdgar::Crawler.perform_async record.id
           end
         end
+      end
+      Company.find_each do |company|
+        SecEdgar::Crawler.perform_async company.id
       end
       nil
     end
