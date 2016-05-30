@@ -21,7 +21,7 @@ module SecEdgar
       http = Net::HTTP.new(uri.host, uri.port)
 
       http.open_timeout = 30
-      http.read_timeout = 30
+      http.read_timeout = 120
 
       http.use_ssl = true
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
