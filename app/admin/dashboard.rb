@@ -21,6 +21,11 @@ ActiveAdmin.register_page "Dashboard" do
   end
 
   content title: proc{ I18n.t("active_admin.dashboard") } do
+
+    div class: "support-area" do
+      h3 { raw "For any support or help, please mail me at: <strong>me@nikhgupta.com</strong>, or Skype me at: <strong>nikh.gupta</strong>"}
+    end
+
     div class: "progress", id: "queue-progress" do
       table do
         thead do
@@ -54,6 +59,8 @@ ActiveAdmin.register_page "Dashboard" do
           end
         end
       end
+
+      small(style: "font-size: 12px") { "updated every few seconds.." }
     end
 
     div style: "clear: both"
@@ -62,7 +69,5 @@ ActiveAdmin.register_page "Dashboard" do
       link = link_to 'run the script', dashboard_run_script_path, method: :post
       raw "Seems like there are no enqueued jobs. You can #{link} now!"
     end
-
-    small(style: "font-size: 12px") { "updated every few seconds.." }
   end
 end
