@@ -19,6 +19,8 @@ module SecEdgar
       [pdf__file, html_file, xlsx_file].each{|f| FileUtils.rm_f f}
       report.processed_at  = Time.now
       report.save
+
+      nil
     end
 
     protected

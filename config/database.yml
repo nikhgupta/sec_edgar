@@ -15,11 +15,12 @@
 # gem 'pg'
 #
 default: &default
+  host: localhost
   adapter: postgresql
   encoding: unicode
   # For details on connection pooling, see rails configuration guide
   # http://guides.rubyonrails.org/configuring.html#database-pooling
-  pool: 25
+  pool: <%= ENV["DB_POOL"] || ENV['RAILS_MAX_THREADS'] || 25 %>
 
 development:
   <<: *default
@@ -81,5 +82,5 @@ test:
 production:
   <<: *default
   database: sec_edgar_production
-  username: sec_edgar
+  username: <%= ENV['SEC_EDGAR_DATABASE_USERNAME'] %>
   password: <%= ENV['SEC_EDGAR_DATABASE_PASSWORD'] %>

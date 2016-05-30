@@ -27,6 +27,8 @@ module SecEdgar
 
         SecEdgar::ReportParser.perform_async report.id if report.unprocessed?
       end
+
+      nil
     end
   end
 end

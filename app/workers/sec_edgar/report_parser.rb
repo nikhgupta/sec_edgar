@@ -15,6 +15,8 @@ module SecEdgar
       file = "/tmp/html-report-#{report_id}.html"
       File.open(file, "wb"){|f| f << html}
       ReportCreator.perform_async report_id, file
+
+      nil
     end
 
     protected

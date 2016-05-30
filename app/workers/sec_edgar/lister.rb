@@ -13,6 +13,7 @@ module SecEdgar
           end
         end
       end
+      nil
     end
 
     protected
