@@ -18,16 +18,17 @@
 
 #footer p { display: none; }
 
-#queue-progress {
-  font-size: 1.4em;
-  width: 50%;
-  margin: 0 auto;
+#queue-progress{ float: left; }
+#dropbox-progress{ float: right; }
+#queue-progress, #dropbox-progress {
+  width: 48%;
+  margin: 0;
   thead th { text-align: center }
   td, th { border: 1px solid #dfdfdf; }
-  .message-area {
-    display: none;
-    background-color: #dfd;
-    padding: 10px 20px;
-    border: 1px solid #aba;
-  }
+}
+.message-area {
+  display: none;
+  background-color: #dfd;
+  padding: 10px 20px;
+  border: 1px solid #aba;
 }

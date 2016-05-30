@@ -4,5 +4,6 @@ Rails.application.routes.draw do
   ActiveAdmin.routes(self)
   mount Sidekiq::Web => "/monitor", as: :monitor
 
-  get '/monitor/status' => "monitor#status"
+  get '/monitor/status'  => "monitor#status"
+  get '/monitor/dropbox' => "monitor#dropbox"
 end

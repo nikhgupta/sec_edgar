@@ -26,19 +26,35 @@ ActiveAdmin.register_page "Dashboard" do
             th(colspan: 2){ "Queue Progress" }
           end
         end
-        tbody(class: "ajaxed-area") do
+        tbody(class: "status-area") do
           tr do
             td(colspan: 2){ "Waiting..."}
           end
         end
       end
-
-      div class: "message-area" do
-        link = link_to 'run the script', dashboard_run_script_path, method: :post
-        raw "Seems like there are no enqueued jobs. You can #{link} now!"
-      end
-
-      small(style: "font-size: 12px") { "updated every second.." }
     end
+    div class: "progress", id: "dropbox-progress" do
+      table do
+        thead do
+          tr do
+            th(colspan: 2){ "Dropbox Stats" }
+          end
+        end
+        tbody(class: "dropbox-area") do
+          tr do
+            td(colspan: 2){ "Waiting..."}
+          end
+        end
+      end
+    end
+
+    div style: "clear: both"
+
+    div class: "message-area" do
+      link = link_to 'run the script', dashboard_run_script_path, method: :post
+      raw "Seems like there are no enqueued jobs. You can #{link} now!"
+    end
+
+    small(style: "font-size: 12px") { "updated every few seconds.." }
   end
 end

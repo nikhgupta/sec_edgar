@@ -10,6 +10,17 @@ class MonitorController < ApplicationController
     end
   end
 
+  def dropbox
+    data = Dropbox::CLIENT.metadata("/Annual Reports")
+    pdf_count  = data["contents"].count{|f| f["path"] =~ /\.pdf$/}
+    xls_count  = data["contents"].count{|f| f["path"] =~ /\.xlsx?$/}
+    total_size = view_context.number_to_human_size(data["contents"].map{|i| i["bytes"]}.sum)
+    data = { pdf_count: pdf_count, xls_count: xls_count, total_size: total_size}.merge(data)
+    respond_to do |format|
+      format.json { render json: data.to_json }
+    end
+  end
+
   private
 
   def set_stats

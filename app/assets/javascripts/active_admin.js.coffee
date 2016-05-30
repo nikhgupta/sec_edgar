@@ -10,12 +10,20 @@ updateStats = ->
     html += "<tr><td>Jobs which failed, but will be retried</td><td>#{response.stats.retry || 0}</td></tr>"
 
     method = if response.stats.enqueued > 0 then 'slideUp' else 'slideDown'
-    $('#queue-progress .message-area')[method]()
-    $("#queue-progress .ajaxed-area").html(html)
+    $('.message-area')[method]()
+    $("#queue-progress .status-area").html(html)
+
+updateDropboxStats = ->
+  $.get '/monitor/dropbox.json', (response) ->
+    html  = "<tr><td>Total PDFs in Dropbox</td><td>#{response.pdf_count || 0}</td></tr>"
+    html += "<tr><td>Total Excel Sheets in Dropbox</td><td>#{response.xls_count || 0}</td></tr>"
+    html += "<tr><td>Total Size of 'Annual Reports'</td><td>#{response.total_size || 0}</td></tr>"
+    $("#dropbox-progress .dropbox-area").html(html)
 
 ready = ->
   if $("#queue-progress").length > 0
-    updateStats()
+    updateStats(); updateDropboxStats()
     setInterval (-> updateStats()), 2000
+    setInterval (-> updateDropboxStats()), 30000
 
 $(document).ready(ready)
