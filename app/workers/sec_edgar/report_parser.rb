@@ -84,6 +84,7 @@ module SecEdgar
         next unless tag.text.blank?
         tag.inner_html = "&nbsp;"
         tag.set_attribute "style", "float: left"
+        tag.set_attribute "id", tag.attr("name")
       end
 
       # remove some extra formatting from the first page of the document
