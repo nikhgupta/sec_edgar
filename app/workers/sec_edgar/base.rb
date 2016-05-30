@@ -1,4 +1,5 @@
-require 'open-uri'
+require "uri"
+require "net/https"
 require 'nokogiri'
 
 module SecEdgar
@@ -16,13 +17,20 @@ module SecEdgar
     end
 
     def get_html(url)
-      h = open(url)
-      Zlib::GzipReader.new(h).read
-    rescue Zlib::GzipFile::Error, Zlib::Error # Not gzipped
-      h.rewind
-      h.read
-    ensure
-      h.close if h
+      uri = URI.parse(url)
+      http = Net::HTTP.new(uri.host, uri.port)
+
+      http.open_timeout = 30
+      http.read_timeout = 30
+
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      http.ssl_version = :TLSv1_2
+      http.ssl_timeout = 30
+
+      request = Net::HTTP::Get.new(uri.request_uri)
+      response = http.request(request)
+      response.body
     end
 
     def get_node(url)

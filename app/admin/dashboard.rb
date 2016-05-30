@@ -30,7 +30,7 @@ ActiveAdmin.register_page "Dashboard" do
       table do
         thead do
           tr do
-            th(colspan: 2){ "Queue Progress" }
+            th(colspan: 2){ "Queue Backlogs" }
           end
         end
         tbody(class: "status-area") do

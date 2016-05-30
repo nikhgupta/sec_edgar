@@ -6,7 +6,7 @@ class MonitorController < ApplicationController
 
   def status
     generated = Report.where("processed_at IS NOT NULL").count
-    stats = { generated: generated }.merge(stats: @stats)
+    stats = { generated: generated, companies: Company.count }.merge(stats: @stats)
     respond_to do |format|
       format.json { render json: stats.to_json }
     end
