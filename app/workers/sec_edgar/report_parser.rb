@@ -48,7 +48,7 @@ module SecEdgar
       data = Hash[keys.map{|i| [i,node.match(/^<#{i}>(.*?)\n/i).try(:[],1)]}]
 
       return if !data[:type] || data[:type].downcase == "xml"
-      return unless data[:filename] =~ /\.(html?|te?xt)$/
+      return unless !data[:filename] || data[:filename] =~ /\.(html?|te?xt)$/
 
       data[:text] = node.match(/^<text>(.*?)<\/text>/mi).try(:[],1)
       data

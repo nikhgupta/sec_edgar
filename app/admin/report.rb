@@ -9,8 +9,9 @@ ActiveAdmin.register Report do
     column("Year", sortable: :filed_at){|r| r.filed_at.year}
     column :form_type
     column(:filing_date, sort: :filed_at){|r| r.filed_at.strftime("%d-%m-%Y")}
-    column(:pdf){ |r| link_to "PDF", r.pdf_url if r.pdf_url? }
-    column(:excel){ |r| link_to "Excel", r.excel_url if r.excel_url? }
+    column(:pdf){   |r| link_to "PDF",   r.pdf_url, target: "_blank" if r.pdf_url? }
+    column(:excel){ |r| link_to "Excel", r.excel_url, target: "_blank" if r.excel_url? }
+    column(:index){ |r| link_to "Index", r.url_for(:index), target: "_blank" }
     column :processed_at
   end
 

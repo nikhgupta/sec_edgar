@@ -2,6 +2,8 @@ class Report < ActiveRecord::Base
   belongs_to :company
   validates_uniqueness_of :accession, scope: [:filed_at, :company_id]
 
+  SEC_ARCHIVES_URL = "https://sec.gov/Archives/"
+
   def raw_path
     "edgar/data/#{company.cik.to_i}/#{accession}.txt"
   end
@@ -12,6 +14,18 @@ class Report < ActiveRecord::Base
 
   def excel_path
     "edgar/data/#{company.cik.to_i}/#{accession.gsub("-", '')}/Financial_Report.xlsx"
+  end
+
+  def url_for(symbol)
+    URI.join(SEC_ARCHIVES_URL, send("#{symbol}_path")).to_s
+  end
+
+  def parse
+    SecEdgar::ReportParser.new.perform self.id
+  end
+
+  def generate
+    SecEdgar::ReportCreator.new.perform self.id
   end
 
   def unprocessed?
