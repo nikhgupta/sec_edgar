@@ -37,7 +37,7 @@ module SecEdgar
         "<div style='page-break-after:always;'>
          <h1 style='padding-top: 600px; text-align: center; font-size: 128px'>#{doc[:type]}</h1>
          </div><div id='body-of-#{doc[:type]}' style='page-break-after:always;'>
-        #{Nokogiri::HTML(doc[:text]).search("body").first.inner_html}</div>"
+        #{Nokogiri::HTML(doc[:text]).search("body").first.try(:inner_html) || doc[:text]}</div>"
       end.join
       "<html><head><title>#{report.name}</title></head><body>#{html}</body></html>"
     end
