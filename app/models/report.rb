@@ -20,13 +20,21 @@ class Report < ActiveRecord::Base
     URI.join(SEC_ARCHIVES_URL, send("#{symbol}_path")).to_s
   end
 
-  def parse
-    SecEdgar::ReportParser.new.perform self.id
+  def name
+    "#{company.symbol} #{filed_at.year} #{company.name}"
   end
 
-  def generate
-    SecEdgar::ReportCreator.new.perform self.id
-  end
+  # def parse
+  #   update_attribute :processed_at, nil
+  #   SecEdgar::ReportParser.new.perform self.id
+  # end
+
+  # def generate
+  #   update_attribute :processed_at, nil
+  #   file = "/tmp/html-report-#{self.id}.html"
+  #   self.parse unless File.exists?(file)
+  #   SecEdgar::ReportCreator.new.perform self.id, file
+  # end
 
   def unprocessed?
     !processed?

@@ -6,6 +6,7 @@ ActiveAdmin.register Company do
     column "Ticker", :symbol
     column "CIK", :cik
     column :name
+    column(:reports){|com| link_to "Reports", "http://localhost:3000/reports?q%5Bcompany_id_eq%5D=#{com.id}&order=filed_at_desc" if com.reports.any?}
     column :listed
     column :industry
     column :sector

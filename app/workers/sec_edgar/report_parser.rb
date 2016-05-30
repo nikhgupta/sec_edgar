@@ -33,14 +33,13 @@ module SecEdgar
     end
 
     def merge_documents_for_reporting(report, documents)
-      name = "#{report.company.symbol} #{report.filed_at.year} #{report.company.name}"
       html = documents.map do |doc|
         "<div style='page-break-after:always;'>
          <h1 style='padding-top: 600px; text-align: center; font-size: 128px'>#{doc[:type]}</h1>
          </div><div id='body-of-#{doc[:type]}' style='page-break-after:always;'>
         #{Nokogiri::HTML(doc[:text]).search("body").first.inner_html}</div>"
       end.join
-      "<html><head><title>#{name}</title></head><body>#{html}</body></html>"
+      "<html><head><title>#{report.name}</title></head><body>#{html}</body></html>"
     end
 
     def extract_info(node)
@@ -74,6 +73,9 @@ module SecEdgar
           end
         end
       end
+
+      # convert all other link tags with names to paragraphs
+      node.search("a[name]").each{|tag| tag.name = "p"; }
 
       # remove some extra formatting from the first page of the document
       node.search("body h5:first, hr[size='3'], body div:first hr[size='1']").remove()

@@ -7,8 +7,8 @@ module SecEdgar
       return if report.processed?
 
       html      = File.read(html_file)
-      pdf__file = "/tmp/#{report.company.symbol} #{report.filed_at.year} #{report.company.name}.pdf"
-      xlsx_file = "/tmp/#{report.company.symbol} #{report.filed_at.year} #{report.company.name} - Financials.xlsx"
+      pdf__file = "/tmp/#{report.name}.pdf"
+      xlsx_file = "/tmp/#{report.name} - Financials.xlsx"
 
       pdf = WickedPdf.new.pdf_from_string html
       xls = open(URI.join(SEC_ARCHIVES_URL, report.excel_path).to_s).read rescue nil
