@@ -1,6 +1,6 @@
 ActiveAdmin.register Report do
   actions :index
-  config.sort_order = "processed_at_asc"
+  config.sort_order = "processed_at_desc"
 
   index do
     column(:ticker){|r| r.company.symbol}
