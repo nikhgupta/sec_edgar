@@ -30,6 +30,8 @@ module SecEdgar
 
       request = Net::HTTP::Get.new(uri.request_uri)
       response = http.request(request)
+
+      raise response.message unless response.code[0] == "2"
       response.body
     end
 

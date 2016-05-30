@@ -79,8 +79,8 @@ module SecEdgar
       end
 
       # convert all other link tags with names to paragraphs
-      node.search("a[name]").each do |tag|
-        tag.name = "p"
+      node.search("[name]").each do |tag|
+        tag.name = "p" if tag.name == "a"
         next unless tag.text.blank?
         tag.inner_html = "&nbsp;"
         tag.set_attribute "style", "float: left"
