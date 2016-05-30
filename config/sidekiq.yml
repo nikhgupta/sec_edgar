@@ -6,5 +6,4 @@ production:
 :queues:
   - [sec_edgar_lister,   1]
   - [sec_edgar_crawler,  1]
-  - [sec_edgar_parser,   1]
-  - [sec_edgar_reporter, 3]
+  - [sec_edgar_parser,   7]

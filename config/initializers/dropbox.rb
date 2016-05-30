@@ -1,4 +1,14 @@
+require 'httpclient'
 require 'dropbox_sdk'
+
+httpclient = HTTPClient.new
+httpclient.send_timeout           = 60
+httpclient.receive_timeout        = 100
+httpclient.connect_timeout        = 10
+httpclient.keep_alive_timeout     = 10
+httpclient.ssl_config.timeout     = 10
+httpclient.ssl_config.verify_mode = OpenSSL::SSL::VERIFY_NONE
+HTTPClient::CLIENT = httpclient
 
 # Because you need the session with the right access token, you need to create one instance per user
 session = DropboxSession.new(ENV['DROPBOX_APP_KEY'], ENV['DROPBOX_APP_SECRET'])

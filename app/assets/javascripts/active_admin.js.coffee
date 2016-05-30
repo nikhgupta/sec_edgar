@@ -17,7 +17,6 @@ updateStats = ->
     html += "<tr><td>Total Companies I found from NASDAQ listings</td><td>#{response.companies || 0}</td></tr>"
     html += "<tr><td>Companies where I need to find filings for</td><td>#{response.stats.queues.sec_edgar_crawler || 0}</td></tr>"
     html += "<tr><td>Filings where I need to generate report for</td><td class='counter'>#{response.stats.queues.sec_edgar_parser || 0}</td></tr>"
-    html += "<tr><td>Reports which I need to convert to PDF and save to Dropbox</td><td>#{response.stats.queues.sec_edgar_reporter || 0}</td></tr>"
 
     method = if response.stats.enqueued > 0 then 'slideUp' else 'slideDown'
     $('.message-area')[method]()

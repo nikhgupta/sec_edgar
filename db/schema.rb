@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160528160510) do
+ActiveRecord::Schema.define(version: 20160530202328) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -37,12 +37,14 @@ ActiveRecord::Schema.define(version: 20160528160510) do
     t.string   "name"
     t.string   "sector"
     t.string   "industry"
-    t.decimal  "last_sale",                precision: 8, scale: 2, default: 0.0
-    t.integer  "market_capital", limit: 8,                         default: 0
+    t.decimal  "last_sale",                 precision: 8, scale: 2, default: 0.0
+    t.integer  "market_capital",  limit: 8,                         default: 0
     t.integer  "ipo_year"
-    t.boolean  "listed",                                           default: true
-    t.datetime "created_at",                                                      null: false
-    t.datetime "updated_at",                                                      null: false
+    t.boolean  "listed",                                            default: true
+    t.datetime "created_at",                                                       null: false
+    t.datetime "updated_at",                                                       null: false
+    t.integer  "reports_count",                                     default: 0
+    t.integer  "processed_count",                                   default: 0
   end
 
   create_table "reports", force: :cascade do |t|

@@ -18,20 +18,13 @@ module SecEdgar
 
     def get_html(url)
       uri = URI.parse(url)
-      http = Net::HTTP.new(uri.host, uri.port)
 
-      http.open_timeout = 30
-      http.read_timeout = 120
+      OpenSSL::SSL::SSLContext::DEFAULT_PARAMS[:options] |= OpenSSL::SSL::OP_NO_SSLv2
+      OpenSSL::SSL::SSLContext::DEFAULT_PARAMS[:options] |= OpenSSL::SSL::OP_NO_SSLv3
+      OpenSSL::SSL::SSLContext::DEFAULT_PARAMS[:options] |= OpenSSL::SSL::OP_NO_COMPRESSION
 
-      http.use_ssl = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      http.ssl_version = :TLSv1_2
-      http.ssl_timeout = 30
-
-      request = Net::HTTP::Get.new(uri.request_uri)
-      response = http.request(request)
-
-      raise response.message unless response.code[0] == "2"
+      response = HTTPClient::CLIENT.get(uri, follow_redirect: true)
+      raise response.reason unless response.ok? || response.redirect?
       response.body
     end
 

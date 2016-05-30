@@ -1,6 +1,10 @@
 class Report < ActiveRecord::Base
-  belongs_to :company
+  belongs_to :company, counter_cache: true
   validates_uniqueness_of :accession, scope: [:filed_at, :company_id]
+
+  scope :processed, ->{ where("processed_at IS NOT NULL") }
+  after_save :update_processed_counter_cache
+  after_destroy :update_processed_counter_cache
 
   SEC_ARCHIVES_URL = "https://sec.gov/Archives/"
 
@@ -51,5 +55,14 @@ class Report < ActiveRecord::Base
     data = Dropbox::CLIENT.shares(data["path"], false)
     uri  = URI.parse(data['url']); uri.query = nil
     update_attribute "#{name}_url", uri.to_s
+  rescue DropboxError => e
+    e.message =~ /failed to grab locks/i ? retry : raise
+  end
+
+  private
+
+  def update_processed_counter_cache
+    self.company.processed_count = self.company.reports.processed.count
+    self.company.save
   end
 end

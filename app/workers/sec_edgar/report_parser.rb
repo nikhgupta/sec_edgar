@@ -10,9 +10,19 @@ module SecEdgar
       docs = docs.map{ |doc| extract_info(doc)  }.compact
       html = merge_documents_for_reporting(report, docs)
       html = sanitize_html(html)
-      file = "/tmp/html-report-#{report_id}.html"
-      File.open(file, "wb"){|f| f << html}
-      ReportCreator.perform_async report_id, file
+
+      pdf__file = "/tmp/#{report.name}.pdf"
+      xlsx_file = "/tmp/#{report.name} - Financials.xlsx"
+
+      pdf = WickedPdf.new.pdf_from_string html
+      xls = get_html URI.join(SEC_ARCHIVES_URL, report.excel_path).to_s rescue nil
+
+      report.add_dropbox_file :pdf,   pdf__file, pdf, true
+      report.add_dropbox_file :excel, xlsx_file, xls, true if xls
+
+      [pdf__file, xlsx_file].each{|f| FileUtils.rm_f f}
+      report.processed_at  = Time.now
+      report.save
 
       nil
     end
@@ -60,31 +70,10 @@ module SecEdgar
     def sanitize_html(html)
       node = Nokogiri::HTML html
 
-      # replace anchor names that conflict with page links in PDF
-      node.search("p font a[name]").each do |a|
-        p = a.ancestors("p").try :first
-        next unless p
-        p.set_attribute("id", a.attr("name").downcase)
-        a.remove
-
-        tags = p.search("a[name]")
-        next if tags.count < 1
-
-        tags.each do |tag|
-          tag.remove
-          node.search("[href='##{tag.attr('name').downcase}']").map do |x|
-            x.set_attribute('href', "##{a.attr('name').downcase}")
-          end
-        end
-      end
-
-      # convert all other link tags with names to paragraphs
-      node.search("[name]").each do |tag|
-        tag.name = "p" if tag.name == "a"
+      node.search("a[name]").each do |tag|
+        tag.set_attribute("id", tag.attr("name"))
         next unless tag.text.blank?
         tag.inner_html = "&nbsp;"
-        tag.set_attribute "style", "float: left"
-        tag.set_attribute "id", tag.attr("name")
       end
 
       # remove some extra formatting from the first page of the document
