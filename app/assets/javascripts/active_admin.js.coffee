@@ -13,12 +13,12 @@ updateProgressBar = ->
 
 updateStats = ->
   $.get "/monitor/status.json", (response) ->
-    html  = "<tr><td>Jobs that need to be processed (all kind of jobs)</td><td>#{response.stats.enqueued}</td></tr>"
-    html += "<tr><td>Jobs which failed, but will be retried</td><td>#{response.stats.retry || 0}</td></tr>"
+    console.log "enqueued: #{response.stats.enqueued} | retry: #{response.stats.retry} |"
+    html  = "<tr><td>Script has started?</td><td>#{if response.stats.enqueued > 0 then "Yes" else "No"}</td></tr>"
     html += "<tr><td>Getting listing from NASDAQ or done?</td><td>#{if response.stats.queues.sec_edgar_lister > 0 then "Fetching.." else "Done!"}</td></tr>"
-    html += "<tr><td>Index calculation remaining for (number of companies)</td><td>#{response.stats.queues.sec_edgar_crawler || 0}</td></tr>"
-    html += "<tr><td>Reports that need to be downloaded and parsed</td><td class='counter'>#{response.stats.queues.sec_edgar_parser || 0}</td></tr>"
-    html += "<tr><td>Reports which need to be converted and saved to Dropbox</td><td>#{response.stats.queues.sec_edgar_reporter || 0}</td></tr>"
+    html += "<tr><td>Companies where I need to find filings for</td><td>#{response.stats.queues.sec_edgar_crawler || 0}</td></tr>"
+    html += "<tr><td>Filings where I need to generate report for</td><td class='counter'>#{response.stats.queues.sec_edgar_parser || 0}</td></tr>"
+    html += "<tr><td>Reports which I need to convert to PDF and save to Dropbox</td><td>#{response.stats.queues.sec_edgar_reporter || 0}</td></tr>"
 
     method = if response.stats.enqueued > 0 then 'slideUp' else 'slideDown'
     $('.message-area')[method]()

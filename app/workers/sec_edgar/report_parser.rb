@@ -32,13 +32,19 @@ module SecEdgar
       html.split("<DOCUMENT>")
     end
 
+    def grab_body_for(doc, with_cover = true)
+      body   = Nokogiri::HTML(doc[:text]).search("body").first.try(:inner_html)
+      body ||= doc[:text]
+      html   = "<div id='body-of-#{doc[:type]}' style='page-break-after:always'>#{body}</div>"
+      return html unless with_cover
+      "<div style='page-break-after:always;'>
+        <h1 style='padding-top: 600px; text-align: center; font-size: 128px'>#{doc[:type]}</h1>
+        </div>#{html}"
+    end
+
     def merge_documents_for_reporting(report, documents)
-      html = documents.map do |doc|
-        "<div style='page-break-after:always;'>
-         <h1 style='padding-top: 600px; text-align: center; font-size: 128px'>#{doc[:type]}</h1>
-         </div><div id='body-of-#{doc[:type]}' style='page-break-after:always;'>
-        #{Nokogiri::HTML(doc[:text]).search("body").first.try(:inner_html) || doc[:text]}</div>"
-      end.join
+      html = documents[1..-1].map{ |doc| grab_body_for(doc, true) }.join
+      html = "#{grab_body_for(documents[0], false)}#{html}"
       "<html><head><title>#{report.name}</title></head><body>#{html}</body></html>"
     end
 
@@ -75,13 +81,19 @@ module SecEdgar
       end
 
       # convert all other link tags with names to paragraphs
-      node.search("a[name]").each{|tag| tag.name = "p"; }
+      node.search("a[name]").each do |tag|
+        tag.name = "p"
+        next unless tag.text.blank?
+        tag.inner_html = "&nbsp;"
+        tag.set_attribute "style", "float: left"
+      end
 
       # remove some extra formatting from the first page of the document
       node.search("body h5:first, hr[size='3'], body div:first hr[size='1']").remove()
 
       html = node.to_s
 
+      # for older filings, which have a completely different format
       if node.search("page").any?
         html = html.gsub("<page>", "</pre><pre style='page-break-after:always'>")
         html = html.gsub(/<\/?(table|caption|s|c)>/, '')
