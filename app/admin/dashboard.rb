@@ -34,6 +34,12 @@ ActiveAdmin.register_page "Dashboard" do
       end
     end
     div class: "progress", id: "dropbox-progress" do
+      div class: "progress progress-bar" do
+        div do
+          span "0%"
+        end
+      end
+
       table do
         thead do
           tr do

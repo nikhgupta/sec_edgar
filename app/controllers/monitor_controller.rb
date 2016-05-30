@@ -5,8 +5,10 @@ class MonitorController < ApplicationController
   before_action :set_queues, only: [:status]
 
   def status
+    generated = Report.where("processed_at IS NOT NULL").count
+    stats = { generated: generated }.merge(stats: @stats)
     respond_to do |format|
-      format.json { render json: { stats: @stats }.to_json }
+      format.json { render json: stats.to_json }
     end
   end
 
