@@ -5,7 +5,9 @@ ActiveAdmin.register_page "Dashboard" do
   menu priority: 1, label: proc{ I18n.t("active_admin.dashboard") }
 
   action_item :run, only: :index do
-    link_to 'Run Script!', dashboard_run_script_path, method: :post
+    unless Sidekiq::Stats.new.enqueued > 0
+      link_to 'Run Script!', dashboard_run_script_path, method: :post
+    end
   end
 
   page_action :run_script, method: :post do
