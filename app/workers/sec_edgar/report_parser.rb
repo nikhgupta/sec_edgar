@@ -1,5 +1,3 @@
-require 'open-uri'
-
 module SecEdgar
   class ReportParser < Base
     sidekiq_options queue: :sec_edgar_parser
@@ -101,16 +99,6 @@ module SecEdgar
       end
 
       html
-    end
-
-    def get_html(url)
-      h = open(url)
-      Zlib::GzipReader.new(h).read
-    rescue Zlib::GzipFile::Error, Zlib::Error # Not gzipped
-      h.rewind
-      h.read
-    ensure
-      h.close if h
     end
   end
 end
