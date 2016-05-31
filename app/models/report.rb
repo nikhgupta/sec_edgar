@@ -49,7 +49,8 @@ class Report < ActiveRecord::Base
   end
 
   def add_dropbox_file(name, tmp_path, data, overwrite = false)
-    to_path = "/Annual Reports/#{File.basename(tmp_path)}"
+    to_path = "/10k Automation/Annual Reports & Financials"
+    to_path = "#{to_path}/#{File.basename(tmp_path)}"
     File.open(tmp_path, "wb"){|f| f << data}
     data = File.open(tmp_path){|f| Dropbox::CLIENT.put_file to_path, f, overwrite}
     data = Dropbox::CLIENT.shares(data["path"], false)

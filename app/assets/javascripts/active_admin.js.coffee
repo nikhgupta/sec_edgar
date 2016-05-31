@@ -28,7 +28,7 @@ updateDropboxStats = ->
     console.log response
     html  = "<tr><td>Total PDFs in Dropbox</td><td class='counter'>#{response.pdf_count || 0}</td></tr>"
     html += "<tr><td>Total Excel Sheets in Dropbox</td><td>#{response.xls_count || 0}</td></tr>"
-    html += "<tr><td>Total Size of 'Annual Reports'</td><td>#{response.total_size || 0}</td></tr>"
+    html += "<tr><td>Total Size of Reports in Dropbox</td><td>#{response.total_size || 0}</td></tr>"
     $("#dropbox-progress .dropbox-area").html(html)
     updateProgressBar()
 

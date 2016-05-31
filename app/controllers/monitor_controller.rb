@@ -13,7 +13,8 @@ class MonitorController < ApplicationController
   end
 
   def dropbox
-    data = Dropbox::CLIENT.metadata("/Annual Reports")
+    path = "/10k Automation/Annual Reports & Financials"
+    data = Dropbox::CLIENT.metadata(path)
     pdf_count  = data["contents"].count{|f| f["path"] =~ /\.pdf$/}
     xls_count  = data["contents"].count{|f| f["path"] =~ /\.xlsx?$/}
     total_size = view_context.number_to_human_size(data["contents"].map{|i| i["bytes"]}.sum)
