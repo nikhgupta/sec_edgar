@@ -25,7 +25,9 @@ class Report < ActiveRecord::Base
   end
 
   def name
-    "#{company.symbol} #{filed_at.year} #{company.name}"
+    str = "#{company.symbol} #{filed_at.year} #{company.name}"
+    return str if form_type.blank? || form_type == "10-K"
+    "#{str} - #{form_type.gsub(/[^a-z0-9]/i, '').upcase}"
   end
 
   # def parse
