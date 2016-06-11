@@ -9,18 +9,21 @@ module SecEdgar
       docs = get_documents report
       docs = docs.map{ |doc| extract_info(doc)  }.compact
       html = merge_documents_for_reporting(report, docs)
-      html = sanitize_html(html)
 
-      pdf__file = Rails.root.join("tmp", "#{filename_for(report)}.pdf")
-      xlsx_file = Rails.root.join("tmp", "#{filename_for(report)} - Financails.xlsx")
+      if html.present?
+        html = sanitize_html(html)
+        pdf__file = Rails.root.join("tmp", "#{filename_for(report)}.pdf")
+        xlsx_file = Rails.root.join("tmp", "#{filename_for(report)} - Financails.xlsx")
 
-      pdf = WickedPdf.new.pdf_from_string html
-      xls = get_html URI.join(SEC_ARCHIVES_URL, report.excel_path).to_s rescue nil
+        pdf = WickedPdf.new.pdf_from_string html
+        xls = get_html URI.join(SEC_ARCHIVES_URL, report.excel_path).to_s rescue nil
 
-      report.add_dropbox_file :pdf,   pdf__file, pdf, true
-      report.add_dropbox_file :excel, xlsx_file, xls, true if xls
+        report.add_dropbox_file :pdf,   pdf__file, pdf, true
+        report.add_dropbox_file :excel, xlsx_file, xls, true if xls
 
-      [pdf__file, xlsx_file].each{|f| FileUtils.rm_f f}
+        [pdf__file, xlsx_file].each{|f| FileUtils.rm_f f}
+      end
+
       report.processed_at  = Time.now
       report.save
 
@@ -57,6 +60,7 @@ module SecEdgar
     end
 
     def merge_documents_for_reporting(report, documents)
+      return if documents.blank?
       html = documents[1..-1].map{ |doc| grab_body_for(doc, true) }.join
       html = "#{grab_body_for(documents[0], false)}#{html}"
       "<html><head><title>#{report.name}</title></head><body>#{html}</body></html>"
