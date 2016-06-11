@@ -32,6 +32,8 @@ module SecEdgar
     def get_documents(report)
       url  = "#{SEC_ARCHIVES_URL}#{report.index_path}"
       node = Nokogiri::HTML get_html(url)
+      report.update_attribute :filed_at, reporting_period_of(node)
+
       docs = node.search(".tableFile a").map{|a| a.attr("href")}
       docs = docs.select{|a| a =~ /\.html?$/ }
       return docs.map{|a| get_html URI.join(SEC_ARCHIVES_URL, a).to_s } if docs.any?
@@ -65,6 +67,11 @@ module SecEdgar
 
       data[:text] = node.match(/^<text>(.*?)<\/text>/mi).try(:[],1)
       data
+    end
+
+    def reporting_period_of(node)
+      data = node.search(".infoHead,.info").map(&:text)
+      Time.parse Hash[data.each_slice(2).to_a]["Period of Report"]
     end
 
     def sanitize_html(html)
