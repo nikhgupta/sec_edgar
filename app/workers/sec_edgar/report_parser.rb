@@ -11,8 +11,8 @@ module SecEdgar
       html = merge_documents_for_reporting(report, docs)
       html = sanitize_html(html)
 
-      pdf__file = "/tmp/#{report.name}.pdf"
-      xlsx_file = "/tmp/#{report.name} - Financials.xlsx"
+      pdf__file = "/tmp/#{filename_for(report)}.pdf"
+      xlsx_file = "/tmp/#{filename_for(report)} - Financials.xlsx"
 
       pdf = WickedPdf.new.pdf_from_string html
       xls = get_html URI.join(SEC_ARCHIVES_URL, report.excel_path).to_s rescue nil
@@ -28,6 +28,10 @@ module SecEdgar
     end
 
     protected
+
+    def filename_for(report)
+      report.name.gsub(/[^a-z0-9\-\.\ ]/i, '')
+    end
 
     def get_documents(report)
       url  = "#{SEC_ARCHIVES_URL}#{report.index_path}"

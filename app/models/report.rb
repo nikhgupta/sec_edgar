@@ -27,20 +27,8 @@ class Report < ActiveRecord::Base
   def name
     str = "#{company.symbol} #{filed_at.year} #{company.name}"
     return str if form_type.blank? || form_type == "10-K"
-    "#{str} - #{form_type.gsub(/[^a-z0-9]/i, '').upcase}"
+    "#{str} - #{form_type}"
   end
-
-  # def parse
-  #   update_attribute :processed_at, nil
-  #   SecEdgar::ReportParser.new.perform self.id
-  # end
-
-  # def generate
-  #   update_attribute :processed_at, nil
-  #   file = "/tmp/html-report-#{self.id}.html"
-  #   self.parse unless File.exists?(file)
-  #   SecEdgar::ReportCreator.new.perform self.id, file
-  # end
 
   def unprocessed?
     !processed?
