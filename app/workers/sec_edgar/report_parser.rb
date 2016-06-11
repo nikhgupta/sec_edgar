@@ -11,8 +11,8 @@ module SecEdgar
       html = merge_documents_for_reporting(report, docs)
       html = sanitize_html(html)
 
-      pdf__file = "/tmp/#{filename_for(report)}.pdf"
-      xlsx_file = "/tmp/#{filename_for(report)} - Financials.xlsx"
+      pdf__file = Rails.root.join("tmp", "#{filename_for(report)}.pdf")
+      xlsx_file = Rails.root.join("tmp", "#{filename_for(report)} - Financails.xlsx")
 
       pdf = WickedPdf.new.pdf_from_string html
       xls = get_html URI.join(SEC_ARCHIVES_URL, report.excel_path).to_s rescue nil
