@@ -1,4 +1,6 @@
 class Report < ActiveRecord::Base
+  DROPBOX_PATH = "/Annual Reports & Financials"
+
   belongs_to :company, counter_cache: true
   validates_uniqueness_of :accession, scope: [:filed_at, :company_id]
 
@@ -25,9 +27,7 @@ class Report < ActiveRecord::Base
   end
 
   def name
-    str = "#{company.symbol} #{filed_at.year} #{company.name}"
-    return str if form_type.blank? || form_type == "10-K"
-    "#{str} - #{form_type}"
+    "#{company.symbol} #{filed_at.localtime.year} #{company.name} - #{form_type}"
   end
 
   def unprocessed?
@@ -39,8 +39,7 @@ class Report < ActiveRecord::Base
   end
 
   def add_dropbox_file(name, tmp_path, data, overwrite = false)
-    to_path = "/10k Automation/Annual Reports & Financials"
-    to_path = "#{to_path}/#{File.basename(tmp_path)}"
+    to_path = "#{DROPBOX_PATH}/#{File.basename(tmp_path)}"
     File.open(tmp_path, "wb"){|f| f << data}
     data = File.open(tmp_path){|f| Dropbox::CLIENT.put_file to_path, f, overwrite}
     data = Dropbox::CLIENT.shares(data["path"], false)
