@@ -22,6 +22,8 @@ module SecEdgar
         report.add_dropbox_file :excel, xlsx_file, xls, true if xls
 
         [pdf__file, xlsx_file].each{|f| FileUtils.rm_f f}
+      else
+        report.empty_html = true
       end
 
       report.processed_at  = Time.now
@@ -62,8 +64,9 @@ module SecEdgar
     def merge_documents_for_reporting(report, documents)
       return if documents.blank?
       html = documents[1..-1].map{ |doc| grab_body_for(doc, true) }.join
-      html = "#{grab_body_for(documents[0], false)}#{html}"
-      "<html><head><title>#{report.name}</title></head><body>#{html}</body></html>"
+      k10  = grab_body_for documents[0], false
+      return nil if k10.blank?
+      "<html><head><title>#{report.name}</title></head><body>#{k10}#{html}</body></html>"
     end
 
     def extract_info(node)
