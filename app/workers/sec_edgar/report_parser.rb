@@ -13,7 +13,7 @@ module SecEdgar
       if html.present?
         html = sanitize_html(html)
         pdf__file = Rails.root.join("tmp", "#{filename_for(report)}.pdf")
-        xlsx_file = Rails.root.join("tmp", "#{filename_for(report)} - Financials.xlsx")
+        xlsx_file = Rails.root.join("tmp", "#{filename_for(report, true)} - Financials.xlsx")
 
         pdf = WickedPdf.new.pdf_from_string html
         xls = get_html URI.join(SEC_ARCHIVES_URL, report.excel_path).to_s rescue nil
@@ -34,8 +34,8 @@ module SecEdgar
 
     protected
 
-    def filename_for(report)
-      report.name.gsub(/[^a-z0-9\-\.\ ]/i, '')
+    def filename_for(report, financial = false)
+      report.name(financial).gsub(/[^a-z0-9\-\.\ ]/i, '')
     end
 
     def get_documents(report)

@@ -26,8 +26,9 @@ class Report < ActiveRecord::Base
     URI.join(SEC_ARCHIVES_URL, send("#{symbol}_path")).to_s
   end
 
-  def name
-    "#{company.symbol} #{filed_at.localtime.year} #{company.name} - #{form_type}"
+  def name(financial = false)
+    rn = "#{company.symbol} #{filed_at.localtime.year} #{company.name}"
+    financial && form_type == "10-K" ? rn : "#{rn} - #{form_type}"
   end
 
   def unprocessed?
