@@ -75,7 +75,7 @@ ActiveAdmin.register_page "Dashboard" do
 
     div class: "empty-html-reports", style: "margin-top: 20px" do
       h3 "Empty HTML Reports (they will be queued again in the last)"
-      ul(style: "columns: 3; -webkit-columns: 3; -moz-columns: 3") do
+      ul(style: "columns: 3; -webkit-columns: 3; -moz-columns: 3; font-family: monospace; font-size: 11px") do
         raw Report.where(empty_html: true).map(&:name).sort_by(&:itself).map{|rn| "<li>#{rn}</li>"}.join
       end
     end
