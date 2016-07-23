@@ -40,6 +40,7 @@ ActiveAdmin.register_page "Dashboard" do
         end
       end
     end
+
     div class: "progress", id: "dropbox-progress" do
       div class: "progress progress-bar" do
         div do
@@ -60,7 +61,7 @@ ActiveAdmin.register_page "Dashboard" do
         end
       end
 
-      small(style: "font-size: 12px") { "updated every few seconds.." }
+      small(style: "font-size: 10px") { "updated every few seconds.." }
     end
 
     div style: "clear: both"
@@ -68,6 +69,15 @@ ActiveAdmin.register_page "Dashboard" do
     div class: "message-area" do
       link = link_to 'run the script', dashboard_run_script_path, method: :post
       raw "Seems like there are no enqueued jobs. You can #{link} now!"
+    end
+
+    hr
+
+    div class: "empty-html-reports", style: "margin-top: 20px" do
+      h3 "Empty HTML Reports (they will be queued again in the last)"
+      ul(style: "columns: 3, -webkit-columns: 3, -moz-columns: 3") do
+        raw Report.where(empty_html: true).map(&:name).map{|rn| "<li>#{rn}</li>"}.join
+      end
     end
   end
 end

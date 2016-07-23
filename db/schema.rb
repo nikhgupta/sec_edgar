@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160530202328) do
+ActiveRecord::Schema.define(version: 20160626130425) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -53,10 +53,11 @@ ActiveRecord::Schema.define(version: 20160530202328) do
     t.string   "form_type"
     t.datetime "filed_at"
     t.datetime "processed_at"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
     t.string   "pdf_url"
     t.string   "excel_url"
+    t.boolean  "empty_html",   default: false
   end
 
   add_index "reports", ["company_id"], name: "index_reports_on_company_id", using: :btree
