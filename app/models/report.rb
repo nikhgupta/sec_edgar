@@ -10,6 +10,12 @@ class Report < ActiveRecord::Base
 
   SEC_ARCHIVES_URL = "https://sec.gov/Archives/"
 
+  def self.find_for(symbol, year)
+    Company.find_by(symbol: symbol).reports.where(
+      "filed_at >= ? AND filed_at < ?", "01-01-#{year}", "01-01-#{year+1}"
+    ).all
+  end
+
   def raw_path
     "edgar/data/#{company.cik.to_i}/#{accession}.txt"
   end

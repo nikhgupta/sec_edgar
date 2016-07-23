@@ -21,10 +21,10 @@ module SecEdgar
     protected
 
     def create_or_update_company(data)
-      scope = Company.where(symbol: data[:symbol])
+      scope = Company.where(symbol: data[:symbol].strip)
       return scope.first if scope.exists?
 
-      Company.create(symbol: data[:symbol],
+      Company.create(symbol: data[:symbol].strip,
                      name: data[:name], sector: data[:sector],
                      industry: data[:industry], ipo_year: data[:ipoyear],
                      last_sale: data[:lastsale], market_capital: data[:marketcap])

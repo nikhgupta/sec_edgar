@@ -24,12 +24,12 @@ module SecEdgar
         [pdf__file, xlsx_file].each{|f| FileUtils.rm_f f}
 
         report.processed_at  = Time.now
+        report.save
       else
         report.empty_html = true
+        report.save
+        self.class.perform_in 3.hours, report.id
       end
-
-      report.save
-      self.class.perform_in 3.hours, report.id
 
       nil
     end
@@ -67,7 +67,7 @@ module SecEdgar
       return if documents.blank?
       html = documents[1..-1].map{ |doc| grab_body_for(doc, true) }.join
       k10  = grab_body_for documents[0], false
-      return nil if Nokogiri::HTML(k10).text.strip.blank?
+      return nil if k10.blank? || Nokogiri::HTML(k10).text.blank?
       "<html><head><title>#{report.name}</title></head><body>#{k10}#{html}</body></html>"
     end
 
